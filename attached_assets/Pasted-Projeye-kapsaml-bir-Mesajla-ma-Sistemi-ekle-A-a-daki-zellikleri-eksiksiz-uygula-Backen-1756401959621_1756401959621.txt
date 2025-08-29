@@ -1,0 +1,43 @@
+Projeye kapsamlı bir **Mesajlaşma Sistemi** ekle. Aşağıdaki özellikleri eksiksiz uygula:
+
+✅ Backend (server/):
+- `messages` adında yeni bir tablo oluştur:
+  - id (primary key)
+  - order_id (ilgili sipariş id’si, foreign key)
+  - sender_id (gönderen kullanıcı id’si)
+  - receiver_id (alıcı kullanıcı id’si)
+  - content (mesaj içeriği, text)
+  - status (sent, delivered, read)
+  - created_at (timestamp, default now)
+- `server/routes/messages.ts` dosyası oluştur:
+  - GET `/messages/:orderId` → Belirli bir siparişin mesajlarını getir
+  - POST `/messages` → Yeni mesaj ekle
+- WebSocket entegrasyonu kur:
+  - Yeni mesaj geldiğinde hem gönderen hem alıcıya anlık ilet
+  - Mesaj okunduğunda karşı tarafa “okundu” bildirimi gönder
+- Bildirim sistemiyle entegre et:
+  - Yeni mesaj geldiğinde `notifications` tablosuna kayıt ekle
+
+✅ Frontend (client/):
+- `pages/Messages.tsx` oluştur:
+  - Sipariş bazlı chat odaları (örn: `/messages/:orderId`)
+  - Gerçek zamanlı yeni mesajlar anında görünsün
+  - Okundu/okunmadı durumlarını göster
+  - Mesaj giriş kutusu (textarea + gönder butonu)
+  - Mesajları gönderirken anlık WebSocket bağlantısını kullan
+- `pages/Orders.tsx` içindeki her siparişin yanına “Mesajlaş” butonu ekle → Tıklayınca o siparişin chat odasına yönlendirsin
+- Navigation bar’a “Mesajlar” sekmesi ekle
+- Okunmamış mesaj sayısını gösteren kırmızı badge ekle
+- Mobil uyumlu, WhatsApp benzeri modern bir chat arayüzü hazırla
+- Mesaj listesinde:
+  - Gönderilen mesaj sağda, alınan mesaj solda gözüksün
+  - Gönderildi / okundu durumları ikonlarla gösterilsin
+  - Yeni mesaj geldiğinde otomatik scroll yapılsın
+
+✅ Demo Hesapları:
+- Alıcı (mehmet@example.com) → Toptancıya mesaj atabilsin
+- Toptancı (ayse@example.com) → Alıcıya cevap verebilsin
+- Her mesaj ilgili `orderId` üzerinden ilişkilendirilsin
+
+Sonuç:
+Tam çalışan, gerçek zamanlı bir Türkçe mesajlaşma sistemi olacak. WebSocket ile anlık mesaj gönderilecek, okunmamış mesajlar sayaçta görünecek, siparişlere bağlı chat odaları olacak ve bildirim sistemiyle entegre çalışacak.
