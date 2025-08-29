@@ -1,0 +1,33 @@
+# 🟩 PROMPT 1 — Kullanıcı Yönetimi (Kayıt, Giriş, Profil, Şifre)
+
+Projede e-posta+şifre tabanlı kimlik doğrulama ve profil yönetimi ekle. Aşağıdaki adımları uygula:
+
+1) **Veritabanı (PostgreSQL) tabloları**  
+- `users` (id UUID PK default gen_random_uuid(), email UNIQUE NOT NULL, password_hash TEXT NOT NULL, first_name TEXT, last_name TEXT, phone TEXT, company TEXT, role TEXT CHECK (role IN ('BUYER','SELLER','ADMIN')) DEFAULT 'BUYER', avatar_url TEXT, notify_email BOOLEAN DEFAULT true, notify_inapp BOOLEAN DEFAULT true, created_at TIMESTAMPTZ DEFAULT now())  
+- İndeks: `CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);`
+
+2) **Backend (Express / TypeScript)**  
+- Ortak: `src/server/middleware/auth.ts` → `authGuard` (Authorization: Bearer <JWT>) ve `roleGuard(...roles)` middleware.  
+- Env: `JWT_SECRET` kullan; yoksa güvenli bir secret üret.  
+- Rotalar:  
+  - `POST /api/auth/register` → email, password, first_name, last_name, company al; bcrypt ile hash’le; email unique kontrolü yap.  
+  - `POST /api/auth/login` → email+password doğrula; JWT üret (user id, role).  
+  - `GET /api/auth/me` → token’dan kullanıcıyı döndür.  
+  - `PUT /api/profile` (auth) → first_name, last_name, phone, company, avatar_url güncelle.  
+  - `PUT /api/profile/password` (auth) → current_password doğrula, new_password ile bcrypt hash update.  
+  - `PUT /api/profile/preferences` (auth) → notify_email, notify_inapp güncelle.
+
+3) **Frontend (React + TS)**  
+- Sayfalar:  
+  - `/login`, `/register` (Türkçe formlar, doğrulamalar, TanStack Query ile istekler).  
+  - `/settings` → sekmeler: “Profil Bilgileri”, “Şifre Değiştir”, “Bildirim Ayarları”, “Profil Fotoğrafı”.  
+- JWT’yi `localStorage`’da tut; `fetch` isteklerine `Authorization: Bearer …` ekle.  
+- Navbar’da giriş/çıkış ve kullanıcının adı + rolü göster. Rol bazlı yönlendirme (ADMIN sayfaları korunsun).
+
+4) **Seed (opsiyonel)**  
+- `scripts/seed.ts`: admin (`admin@example.com/123456`), seller (`ayse@firma.com/123456`), buyer (`mehmet@firma.com/123456`) oluştur.
+
+5) **Türkçe metinler**  
+- Tüm UI/metinler Türkçe; hata/success mesajları kullanıcı dostu olsun.
+
+Bittiğinde: `/register` ve `/login` ile test edilebilir olmalı; `/settings`’te bilgiler düzenlenebilmeli.
